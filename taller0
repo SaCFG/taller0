@@ -1,0 +1,624 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.Iterator;
+import java.util.Scanner;
+
+import Bases.Lector;
+import ucn.ArchivoEntrada;
+import ucn.Registro;
+
+
+public class taller0 {
+	
+	private static String[][] sala1m = new String[11][31];
+	private static String[][] sala2m = new String[11][31];
+	private static String[][] sala3m = new String[11][31];
+	private static String[][] sala1t = new String[11][31];
+	private static String[][] sala2t = new String[11][31];
+	private static String[][] sala3t = new String[11][31];	
+	private static String [][] personas;
+	private static int contPersonas;
+	private static int contPeliculas;
+	private static String [] peliculas;
+	private static int [] recaudacion;
+	private static int[][] infoPeliculas = new int[contPeliculas][15];
+	private static String cartelera;
+	private static String listaEntrda;
+	private static File clientes = new File("clientes.txt");
+	private static File status = new File("status.txt");
+	private static File peliculasA = new File("peliculas.txt");
+	
+	
+	public static void main(String[] args) {
+		manejoMatriz(sala1m);
+		manejoMatriz(sala2m);
+		manejoMatriz(sala3m);
+		manejoMatriz(sala1t);
+		manejoMatriz(sala2t);
+		manejoMatriz(sala3t);
+		
+		
+		String clientesn = "clientes";
+		String statusn = "status";
+		String peliculasn = "peliculas";
+		lector(clientes,clientesn);
+		lector(status,statusn);
+		lector(peliculasA,peliculasn);
+		
+		
+		iniciarSesion();
+		
+
+		
+	}
+
+ 
+	public static String lector(File archivo,String nom) {
+		String [] dato;
+		
+		try {
+			BufferedReader bf = new BufferedReader(new FileReader(archivo));
+			String bfRead;
+			while((bfRead = bf.readLine()) != null) {
+				dato = bfRead.split(",");
+				switch (nom) {
+				case "clientesT": 
+					String completo;
+					dato[0].toLowerCase();
+					dato[0].toUpperCase().charAt(0);
+					dato[1].toLowerCase();
+					dato[1].toUpperCase().charAt(0);
+					completo = dato[0]+"_"+dato[1];
+	
+					personas[contPersonas][0] = completo;
+					personas[contPersonas][1] = limpiar(dato[2]);
+					personas[contPersonas][2] = dato[3];
+					personas[contPersonas][3] = dato[4];
+					break;
+				case "status":
+				 	int comprar = buscarC(dato[0], personas, 0, contPersonas);
+				 	dato[1].replace("HABILITADO", "1");
+				 	dato[1].replace("NO HABILITADO", "0");
+					if(dato[0]=personas[comprar][0]){		
+						personas[comprar][4] = dato[1];
+					}						
+					break;
+					
+				case "peliculas":
+					
+					peliculas[contPeliculas] = dato[0];
+					dato[1].replace("estreno","1");
+					dato[1].replace("liberada","0");
+					infoPeliculas[contPeliculas][0] = Integer.parseInt(dato[1]);
+					recaudacion[contPeliculas] = Integer.parseInt(dato[2]);					
+					infoPeliculas[contPeliculas][1] = Integer.parseInt(dato[3]);	
+					dato[4].replace("M","4");
+					dato[4].replace("T","5");
+					infoPeliculas[contPeliculas][2] =Integer.parseInt(dato[4]);				
+					infoPeliculas[contPeliculas][3] = Integer.parseInt(dato[5]);	
+					dato[5].replace("M","4");
+					dato[5].replace("T","5");
+					infoPeliculas[contPeliculas][4] =Integer.parseInt(dato[5]);					
+					infoPeliculas[contPeliculas][5] = Integer.parseInt(dato[6]);	
+					dato[7].replace("M","4");
+					dato[7].replace("T","5");
+					infoPeliculas[contPeliculas][6] =Integer.parseInt(dato[7]);					
+					infoPeliculas[contPeliculas][7] = Integer.parseInt(dato[8]);	
+					dato[9].replace("M","4");
+					dato[9].replace("T","5");
+					infoPeliculas[contPeliculas][8] =Integer.parseInt(dato[9]);					
+					infoPeliculas[contPeliculas][9] = Integer.parseInt(dato[10]);	
+					dato[11].replace("M","4");
+					dato[11].replace("T","5");
+					infoPeliculas[contPeliculas][10] =Integer.parseInt(dato[11]);
+					infoPeliculas[contPeliculas][11] = Integer.parseInt(dato[12]);	
+					dato[13].replace("M","4");
+					dato[13].replace("T","5");
+					infoPeliculas[contPeliculas][12] =Integer.parseInt(dato[13]);
+					break;
+				}
+			}
+			
+			
+			
+		} catch (Exception e) {System.err.println("No se encontro el archivo");
+			}
+		
+	}
+	
+	public static void iniciarSesion(){
+		String a; // usrario
+		String b; // contraseña
+		Scanner sc = new Scanner(System.in);
+		int pass = 0;
+		do {
+			System.out.println("Ingrese su usuario/rut(sin - ni .): ");
+			a = sc.next();
+			a = limpiar(a);
+			if (a != personas[buscarC(a,personas,2,contPersonas)][1] && a != "ADMIN") {
+				int opcion;
+				System.out.println("Su rut no se encuentra o esta mal escrito desea: "
+						+ "\n1) Reintentar "
+						+ "\n2) Inscribirse"
+						+ "\n3) Salir");
+				opcion = sc.nextInt();
+				switch (opcion) {
+				case 1:
+					break;
+				case 2:
+					String nom;
+					String ape;
+					String rut;
+					String contra;
+					String saldo;
+					String estado;
+					String completo;
+					System.out.println("Ingrese su nombre: ");
+					nom = sc.next();
+					System.out.println("Ingrese su apelldio: ");
+					ape = sc.next();
+					System.out.println("Ingrese su rut: ");
+					rut = sc.next();
+					System.out.println("Ingrese su contraseña: ");
+					contra = sc.next();
+					System.out.println("Ingrese su saldo: ");
+					saldo = sc.next();
+					System.out.println("Ingrese su estado de su pase de movilidad: ");
+					estado = sc.next();
+					nom.toLowerCase();
+					nom.toUpperCase().charAt(0);
+					ape.toLowerCase();
+					ape.toUpperCase().charAt(0);
+					completo = nom +"_"+ape;
+					contPersonas += 1;
+					personas[contPersonas][0] = completo;
+					personas[contPersonas][1] = rut;
+					personas[contPersonas][2] = contra;
+					personas[contPersonas][3] = saldo;
+					personas[contPersonas][4] = estado;
+					
+					menuCliente(rut);					
+					break;
+					
+				case 3:
+					salir();
+					break;
+				}
+			}
+			else { 
+				pass += 1;
+				}		
+		} while (pass != 1);
+		int pass2 = 0;
+		do {
+			System.out.println(a);
+			System.out.println("Ingrese su contraseña: ");
+			b = sc.next();
+			int indice;
+			if (a != "ADMIN" && b != "ADMIN") {
+				indice = buscarC(a, personas, 1, contPersonas);
+				if (personas[indice][2].equals(b)) {
+					menuCliente(a);
+				}
+				else {
+					System.out.print("Contraseña erronea");
+				}
+			}
+			
+			else if (a.equals("ADMIN") && b.equals("ADMIN")) {
+				menuAdmin();
+			}
+			
+		} while (pass2 != 1);	
+	}
+	
+	public static String limpiar(String rut) {
+		rut = rut.replace(" ", ""); 
+		rut = rut.replace("-", "");
+		rut = rut.replace(".", "");
+		String newrut;
+		newrut = rut.toUpperCase();
+		return newrut;
+	}
+
+	public static int buscarC(String dato, String matriz[][], int columna, int cont) {
+			
+		int ini = -1;
+		for (int i=0;i<=cont;i++) {
+			if(matriz[i][columna].equals(dato)) {
+				ini = i;
+			}
+		}
+		return ini;
+	}
+	
+	public static int buscarS(String dato, String matriz[], int cont) {
+		
+		int ini = -1;
+		for (int i=0;i<=cont;i++) {
+			if(matriz[i].equals(dato)) {
+				ini = i;
+			}
+		}
+		return ini;
+	}
+	
+	public static void buscarM(String dato, String matriz[][],String nombresala) {
+		
+		for (int i=0;i<=10;i++)
+		{
+			for (int j=0;j<=30;j++)
+			{
+				if(matriz[i][j].equals(dato)) {
+					listaEntrda = listaEntrda +" - "+nombresala + " fila " +i+ " columna " +j+ " - ";
+				}
+			}
+		}
+	}
+	
+	public static void salir() {
+		String clientesn = "clientes";
+		String peliculasn = "peliculas";
+		sobreescribir(clientes, clientesn);
+		sobreescribir(peliculasA, peliculasn);
+		System.exit(0);
+	}
+	
+	public static void sobreescribir(File archivo,String nom) {
+		try {
+			if(!archivo.exists()) {
+				archivo.createNewFile();
+			}
+			
+			BufferedWriter archivoWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(archivo, true),"utf-8"));
+			switch (nom) {
+			case "clientes": 
+				archivoWriter.write(personas);
+			case "peliculas":
+				archivoWriter.write(peliculas);		
+			}
+			
+			
+			archivoWriter.close()
+		} catch (Exception e) {
+		}
+	}
+	
+	public static void manejoMatriz(String[][]matriz) {
+		
+		for (int i=1;i<=10;i++)
+		{
+			String valor = Integer.toString(i);
+			matriz[i][0] = valor;		
+		}
+		
+		for (int i=1;i<=30;i++)
+		{
+			String valor = Integer.toString(i);
+			matriz[i][0] = valor;		
+		}
+		
+		for (int i=1;i<=4;i++)
+		{
+			for (int j=1;j<=5;j++)
+			{
+				matriz[i][j] = "99";//inicia matriz esquina izquierda
+			}
+		}
+		for (int i=1;i<=4;i++)
+		{
+			for (int j=26;j<=30;j++)
+			{
+				matriz[i][j] = "99";//inicia matriz esquina derecha
+			}
+		}
+	}
+	
+	public static void menuCliente(String rut) {
+		int cond = 0;
+		
+		Scanner sc = new Scanner(System.in);
+		do {
+			int opcion;
+			System.out.println("Su rut no se encuentra o esta mal escrito desea: "
+					+ "\n1) Comprar entrada "
+					+ "\n2) Info usuario"
+					+ "\n3) Devolver entrada"
+					+ "\n4) Cartelera"
+					+ "\n5) Salir");
+			opcion = sc.nextInt();
+			
+			switch(opcion) {
+			
+			case 1:
+				comprarEntrada(rut);
+		
+			case 2:
+				infoCliente(rut);
+				break;
+			case 3:
+				devolver(rut);
+				break;
+			case 4:
+				System.out.println(cartelera);
+				break;
+			case 5:
+				sc.close();
+				salir();
+				break;
+			default:
+				System.out.println("Opcion no valida");
+			}
+		} while (cond != 1);
+	}
+	
+	public static void menuAdmin() {
+		int cond = 0;
+		String cliente;
+		Scanner sc = new Scanner(System.in);
+		do {
+			int opcion;
+			System.out.println("Su rut no se encuentra o esta mal escrito desea: "
+					+ "\n1) Taquilla "
+					+ "\n2) Info cliente"
+					+ "\n3) Salir");
+			opcion = sc.nextInt();
+			
+			switch(opcion) {
+			
+			case 1:
+				taquilla();
+				break;
+			case 2:
+				System.out.println("Ingrese el rut del cliente: ");
+				cliente = sc.next();
+				cliente = limpiar(cliente);
+				infoCliente(cliente);
+				break;
+			case 3:
+				sc.close();
+				salir();
+			default:
+				System.out.println("Opcion no valida");
+			}
+		}while (cond != 1);
+	}
+	
+	public static void taquilla(){
+		for (int i=0;i<=contPeliculas;i++) {
+			System.out.println(peliculas[i]+" recaudacion total "+ recaudacion[i]
+					+" recaudacion mañana "+ infoPeliculas[i][13]
+					+" recaudacion tarde "+ infoPeliculas[i][14]);
+		}
+		
+	}
+	
+	public static void devolver(String rut) {
+		Scanner sc = new Scanner(System.in);
+		int indicerut = buscarC(rut, personas, 0, contPersonas);
+		buscarM(rut, sala1m,"sala1m");
+		buscarM(rut, sala2m,"sala2m");
+		buscarM(rut, sala3m,"sala3m");
+		buscarM(rut, sala1t,"sala1t");
+		buscarM(rut, sala2t,"sala2t");
+		buscarM(rut, sala3t,"sala3t");
+		System.out.println(listaEntrda+"\nIndique cuantas desea devolver: ");
+		int cantidad = sc.nextInt();
+		while (cantidad != 0) {
+		System.out.println("Indique si era estreno o no: (1 si 0 no)");
+		int estado = sc.nextInt();
+		System.out.println("Indique Sala: ");
+		String sala = sc.next();
+		System.out.println("Indique fila: ");
+		int fila = sc.nextInt();
+		System.out.println("Indique columna: ");
+		int columna = sc.nextInt();
+		
+		if(estado = 1) {
+			int saldo = Integer.parseInt(personas[indicerut][3]);
+			saldo += 5500*0.8;
+			personas[indicerut][3] = Integer.toString(saldo);
+		}
+		else{
+			int saldo = Integer.parseInt(personas[indicerut][3]);
+			saldo += 4000*0.8;
+			personas[indicerut][3] = Integer.toString(saldo);
+		}
+		
+		switch (sala) {
+		case "1m": 
+			sala1m[fila][columna] = "0";
+			break;
+		case "2m": 
+			sala2m[fila][columna] = "0";
+			break;
+		case "3m": 
+			sala3m[fila][columna] = "0";
+			break;
+		case "1t": 
+			sala1t[fila][columna] = "0";
+			break;
+		case "2t": 
+			sala2t[fila][columna] = "0";
+			break;
+		case "3t": 
+			sala3t[fila][columna] = "0";
+			break;
+		
+		}
+		}
+		
+		
+	}
+	
+	public static void infoCliente(String rut) {
+		int indice;
+		String nom;
+		indice= buscarC(rut, personas, 0, contPersonas);
+		buscarM(rut, sala1m,"sala1m");
+		buscarM(rut, sala2m,"sala2m");
+		buscarM(rut, sala3m,"sala3m");
+		buscarM(rut, sala1t,"sala1t");
+		buscarM(rut, sala2t,"sala2t");
+		buscarM(rut, sala3t,"sala3t");
+		
+		nom = personas[indice][0].replace("_", " ");
+		System.out.println("Nombre y apellido: "+ nom
+				+ "\nRut"+ personas[indice][1]
+				+ "\nSaldo"+ personas[indice][3]
+				+ "\nEntradas" + listaEntrda);
+		listaEntrda="";
+		
+	}
+	
+	public static void comprarEntrada(String rut) {
+		String peli;
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Nombre de la pelicula: ");
+		peli = sc.next();
+		int indice;
+		String disponible = "";
+		indice = buscarS(peli, peliculas, contPeliculas);
+		for (int i=1;i<=12;i++) {
+			String npeli = infoPeliculas[indice][i];
+			if (npeli!=0) {
+				if(npeli="1" || npeli="2" || npeli="3") {
+					disponible += " - sala "+ npeli + " hora ";
+				}
+				else if(npeli="4") {
+					disponible += "Mañana - ";		
+				}
+				else if(npeli="5") {
+					disponible += "Tarde - ";
+				}
+			}
+		}
+		System.out.println("Seleciones una funcion:"
+				+ "\nSala: ");
+		String sala = sc.next();
+		System.out.println("Hora: (exresada como m o t)");
+		String hora = sc.next();
+		String opcion = sala+hora;
+		int total;
+		switch (opcion) {
+		
+		case "1m":
+			comprarAsiento(sala1m, rut, indice);
+		case "2m":
+			comprarAsiento(sala2m, rut, indice);			
+		case "3m":				
+			comprarAsiento(sala3m, rut, indice);
+		case "1t":			
+			comprarAsiento(sala1t, rut, indice);
+		case "2t":
+			comprarAsiento(sala2t, rut, indice);
+		case "3t":
+			comprarAsiento(sala3t, rut, indice);
+		}
+		
+	}
+	
+	public static void comprarAsiento(String [][]matirz,String rut,int indice) {
+		Scanner sc = new Scanner(System.in);
+		for (int i=0;i<=10;i++){
+			for (int j=0;j<=30;j++){
+				if (matirz[i][j]!= "0" || matirz[i][j]!= "99" ) {
+					System.out.print("1" + " ");
+				}
+				else { 
+					System.out.print(matirz[i][j] + " ");
+				}
+				
+			}}
+		System.out.println("Cuantas entradas va a comprar?: ");
+		int cantidad = sc.nextInt();
+		int cant = cantidad;
+		int cantCordenadas = cantidad*2;
+		int [] cordenadas = new int[cantidad *2];
+		do { 
+			System.out.println("Selecione un asiento (recuerde no escojer aquellos marcados con un 1 o un 99, debido a que de ser asi no se le devolvera su dinero) "
+					+"\fila: ");
+			int fila = sc.nextInt();
+			System.out.println("Columna: ");
+			int columna = sc.nextInt();
+			
+			if(matirz[fila][columna] = "0" && matirz[fila][columna-1] = "0" && matirz[fila][columna-1] = "0" ) {
+				matirz[fila][columna] = rut;
+			}
+			cordenadas += fila;
+			cordenadas += columna;
+			cantidad -= 1;
+		int total = 0;
+		} while (cantidad != 0);
+		int estado = infoPeliculas[indice][0];
+		String pase = personas[buscarC(rut,personas, 4, contPersonas)][4];
+		
+		if (estado = 1) { // estreno
+			if(pase= "1") {
+				int total = (int) (cant * (5500*0.85));
+			}
+			else {}
+			int total = cant * 5500;
+		}
+		else if (estado = 0) { //liberada
+			if(pase= "1") {
+				int total = (int) (cant * (4000*0.85));
+			}
+			else {}
+			int total = cant * 4000;
+		}
+		
+		int x = 1;
+		int indicerut = buscarC(rut, personas, 0, contPersonas);
+		do {
+		System.out.println("Total: $"+ total + "\nEsta seguro de relaizar la compra? ");
+		String ele = sc.next();
+		
+		switch (ele) {
+		case "Si":
+			if(total < personas[indicerut][3]) {
+				System.out.println("Compra exitosa");
+			}
+			else {
+				System.out.println("Usted no pose el saldo \nDesea recargar?: ");
+				String elec = sc.next();
+				switch (elec) {
+				case "Si":
+					System.out.println("Cuanto va a recargar");
+					int recarga = sc.nextInt();
+					int saldo = Integer.parseInt(personas[indicerut][3]);
+					saldo += recarga;
+					personas[indicerut][3] = Integer.toString(saldo);
+				case "No":
+					while (cantCordenadas != 0) {
+						
+						for (int i=0;i<=cantCordenadas;i++) {
+							matirz[cordenadas[i]][cordenadas[i+1]] = "0";
+							i+=1;
+							cantCordenadas-2;
+						}
+					}
+					x -= 1;
+					break;
+				}
+			}
+		case "No":
+			while (cantCordenadas != 0) {
+				
+				for (int i=0;i<=cantCordenadas;i++) {
+					matirz[cordenadas[i]][cordenadas[i+1]] = "0";
+					i+=1;
+					cantCordenadas-2;
+				}
+			}
+			x -= 1;
+			break;
+		}
+		}while(x != 0);	
+	}	
+}
